@@ -1,0 +1,110 @@
+{
+  "version": "1.0",
+  "items": [
+    {
+      "id": 101,
+      "name": "Gladius",
+      "type": "weapon",
+      "slot": "main_hand",
+      "job_requirements": ["swordsman", "knight"],
+      "stats": {
+        "atk": 18,
+        "str": 3
+      },
+      "ko_style": true,
+      "icon": "weapons/gladius.png",
+      "description": "KO-style straight sword favored by El Morad warriors"
+    },
+    {
+      "id": 102,
+      "name": "Composite Bow",
+      "type": "weapon",
+      "slot": "two_hand",
+      "job_requirements": ["archer", "hunter"],
+      "stats": {
+        "atk": 15,
+        "dex": 5
+      },
+      "ro_style": true,
+      "icon": "weapons/composite_bow.png",
+      "description": "RO-style bow with superior balance"
+    },
+    {
+      "id": 201,
+      "name": "Plate Armor",
+      "type": "armor",
+      "slot": "chest",
+      "job_requirements": ["swordsman", "knight"],
+      "stats": {
+        "def": 25,
+        "vit": 5,
+        "movement_speed": -0.1
+      },
+      "ko_style": true,
+      "icon": "armor/plate.png",
+      "description": "Heavy KO-style armor for frontline fighters"
+    },
+    {
+      "id": 202,
+      "name": "Silk Robe",
+      "type": "armor",
+      "slot": "chest",
+      "job_requirements": ["mage", "acolyte"],
+      "stats": {
+        "def": 8,
+        "mdef": 15,
+        "int": 3
+      },
+      "ro_style": true,
+      "icon": "armor/silk_robe.png",
+      "description": "RO-style enchanted robe for spellcasters"
+    },
+    {
+      "id": 301,
+      "name": "Health Potion",
+      "type": "consumable",
+      "stackable": true,
+      "max_stack": 20,
+      "effects": {
+        "restore_hp": 150
+      },
+      "icon": "consumables/health_potion.png",
+      "description": "Restores HP (KO-style instant healing)"
+    },
+    {
+      "id": 302,
+      "name": "Blue Herb",
+      "type": "consumable",
+      "stackable": true,
+      "max_stack": 30,
+      "effects": {
+        "restore_hp": 50,
+        "restore_hp_over_time": 100
+      },
+      "ro_style": true,
+      "icon": "consumables/blue_herb.png",
+      "description": "RO-style gradual HP recovery herb"
+    },
+    {
+      "id": 401,
+      "name": "Poring Card",
+      "type": "card",
+      "slot": "accessory",
+      "stats": {
+        "hp": 50,
+        "luck": 1
+      },
+      "ro_style": true,
+      "icon": "cards/poring.png",
+      "description": "RO-style card with Poring's blessing"
+    },
+    {
+      "id": 402,
+      "name": "Wolf Fang",
+      "type": "material",
+      "quest_item": true,
+      "icon": "materials/wolf_fang.png",
+      "description": "KO-style crafting material from wolves"
+    }
+  ]
+}

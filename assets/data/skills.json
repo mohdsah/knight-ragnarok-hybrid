@@ -1,0 +1,107 @@
+{
+  "version": "1.0",
+  "skills": [
+    {
+      "id": 1,
+      "name": "Bash",
+      "type": "melee",
+      "job": ["swordsman", "knight"],
+      "level_requirement": 1,
+      "sp_cost": 10,
+      "cooldown": 3,
+      "effects": {
+        "damage": {
+          "base": 30,
+          "str_multiplier": 1.2
+        },
+        "bonus_vs": ["plant", "insect"]
+      },
+      "animation": "slash_effect",
+      "sound": "slash.wav",
+      "ko_style": true,
+      "description": "KO-style powerful melee strike"
+    },
+    {
+      "id": 2,
+      "name": "Heal",
+      "type": "support",
+      "job": ["acolyte", "priest"],
+      "level_requirement": 1,
+      "sp_cost": 15,
+      "cooldown": 5,
+      "effects": {
+        "heal": {
+          "base": 100,
+          "int_multiplier": 0.8
+        },
+        "target": ["self", "party"]
+      },
+      "animation": "heal_effect",
+      "sound": "heal.wav",
+      "ro_style": true,
+      "description": "RO-style holy healing magic"
+    },
+    {
+      "id": 3,
+      "name": "Arrow Storm",
+      "type": "ranged",
+      "job": ["archer", "hunter"],
+      "level_requirement": 15,
+      "sp_cost": 25,
+      "cooldown": 8,
+      "effects": {
+        "damage": {
+          "base": 20,
+          "dex_multiplier": 1.5,
+          "hits": 5
+        },
+        "aoe": 3
+      },
+      "animation": "arrow_rain",
+      "sound": "arrow_volley.wav",
+      "hybrid": true,
+      "description": "Hybrid skill - Rapid arrow barrage"
+    },
+    {
+      "id": 4,
+      "name": "Berserk",
+      "type": "buff",
+      "job": ["knight"],
+      "level_requirement": 30,
+      "sp_cost": 40,
+      "cooldown": 30,
+      "duration": 15,
+      "effects": {
+        "self_buff": {
+          "atk_percent": 30,
+          "def_penalty": 20
+        }
+      },
+      "animation": "red_aura",
+      "sound": "berserk.wav",
+      "ko_style": true,
+      "description": "KO-style battle frenzy (high risk/reward)"
+    },
+    {
+      "id": 5,
+      "name": "Fire Bolt",
+      "type": "magic",
+      "job": ["mage", "wizard"],
+      "level_requirement": 5,
+      "sp_cost": 12,
+      "cooldown": 2,
+      "effects": {
+        "damage": {
+          "base": 40,
+          "int_multiplier": 1.8,
+          "element": "fire"
+        },
+        "bonus_vs": ["insect", "plant"]
+      },
+      "animation": "fire_blast",
+      "sound": "fire_cast.wav",
+      "ro_style": true,
+      "description": "RO-style elemental magic"
+    }
+  ]
+}

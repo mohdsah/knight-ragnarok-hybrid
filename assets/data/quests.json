@@ -1,0 +1,113 @@
+{
+  "version": "1.0",
+  "quests": [
+    {
+      "id": 1001,
+      "title": "Slime Extermination",
+      "type": "hunt",
+      "starting_npc": "Guard Captain",
+      "starting_map": "prontera",
+      "starting_coords": [125, 80],
+      "requirements": {
+        "min_level": 1,
+        "max_level": 10,
+        "job": ["novice"]
+      },
+      "objectives": [
+        {
+          "type": "kill",
+          "target": "slime",
+          "amount": 10,
+          "description": "Eliminate slimes near Prontera gates"
+        }
+      ],
+      "rewards": {
+        "exp": 500,
+        "gold": 200,
+        "items": [
+          {
+            "id": 301,
+            "amount": 5
+          }
+        ],
+        "unlocks": [1002]
+      },
+      "ko_style": false,
+      "ro_style": true
+    },
+    {
+      "id": 1002,
+      "title": "Orc Invasion",
+      "type": "hunt",
+      "starting_npc": "Warrior Chief",
+      "starting_map": "elmorad",
+      "starting_coords": [320, 210],
+      "requirements": {
+        "min_level": 15,
+        "job": ["swordsman", "archer"]
+      },
+      "objectives": [
+        {
+          "type": "kill",
+          "target": "orc_warrior",
+          "amount": 20,
+          "description": "Defend El Morad from orc raiders"
+        },
+        {
+          "type": "collect",
+          "target": "orc_badge",
+          "amount": 5,
+          "drop_chance": 0.3
+        }
+      ],
+      "rewards": {
+        "exp": 1500,
+        "gold": 800,
+        "items": [
+          {
+            "id": 101,
+            "amount": 1
+          }
+        ],
+        "unlocks": [1003, 2001]
+      },
+      "ko_style": true,
+      "ro_style": false
+    },
+    {
+      "id": 2001,
+      "title": "Dungeon Exploration",
+      "type": "dungeon",
+      "starting_npc": "Adventurer's Guild",
+      "starting_map": "prontera",
+      "requirements": {
+        "min_level": 20,
+        "completed_quests": [1002]
+      },
+      "objectives": [
+        {
+          "type": "clear",
+          "dungeon": "anthell",
+          "description": "Clear Anthell dungeon"
+        },
+        {
+          "type": "defeat",
+          "target": "ant_queen",
+          "amount": 1
+        }
+      ],
+      "rewards": {
+        "exp": 3000,
+        "gold": 1500,
+        "items": [
+          {
+            "id": 401,
+            "amount": 1
+          }
+        ],
+        "title": "Dungeon Explorer"
+      },
+      "hybrid": true
+    }
+  ]
+}

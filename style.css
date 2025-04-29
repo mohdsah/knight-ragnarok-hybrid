@@ -1,0 +1,79 @@
+/* ============================================= */
+/* KO-RO HYBRID MMO - MAIN STYLESHEET */
+/* ============================================= */
+
+/* ==================== */
+/* BASE STYLES */
+/* ==================== */
+:root {
+  /* KO-Style Colors */
+  --ko-gold: #f1c40f;
+  --ko-red: #e74c3c;
+  --ko-dark: #2c3e50;
+  
+  /* RO-Style Colors */
+  --ro-blue: #3498db;
+  --ro-green: #2ecc71;
+  --ro-purple: #9b59b6;
+  
+  /* Shared Colors */
+  --health-red: #e74c3c;
+  --mana-blue: #3498db;
+  --exp-yellow: #f1c40f;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #000;
+  color: #fff;
+  overflow: hidden;
+  touch-action: none;
+}
+
+/* ==================== */
+/* GAME CONTAINER */
+/* ==================== */
+#game-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+canvas {
+  display: block;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* ==================== */
+/* LOADING SCREEN */
+/* ==================== */
+#loading-screen {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at center, #2c3e50 0%, #000000 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  transition: opacity 0.5s;
+}
+
+.loading-logo {
+  font-family: 'Arial Black', sans-serif;
+  font-size: 3.5rem;
+  background: linear-gradient(to right, var(--ko-red), var(--ro-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 15

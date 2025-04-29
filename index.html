@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KO-RO Hybrid MMO</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+        }
+        #game-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        #loading-screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            z-index: 1000;
+        }
+        #progress-bar {
+            width: 300px;
+            height: 20px;
+            background: #333;
+            margin-top: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        #progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, #f39c12, #f1c40f);
+            transition: width 0.3s;
+        }
+        .logo {
+            font-family: 'Arial Black', sans-serif;
+            font-size: 48px;
+            background: linear-gradient(to right, #e74c3c, #3498db);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-screen">
+        <div class="logo">KO-RO HYBRID</div>
+        <div>Loading game assets...</div>
+        <div id="progress-bar">
+            <div id="progress-fill"></div>
+        </div>
+    </div>
+    <div id="game-container"></div>
+
+    <!-- Custom Phaser Build with MMO Extensions -->
+    <script src="libs/phaser.mmo.min.js"></script>
+    
+    <!-- Custom Howler Build with MMO Extensions -->
+    <script src="libs/howler.mmo.min.js"></script>
+    
+    <!-- Game Scripts -->
+    <script>
+        // =============================================
+        // GAME CONFIGURATION
+        // =============================================
+        const GameConfig = {
+            type: Phaser.AUTO,
+            parent: 'game-container',
+            width: 1280,
+            height: 720,
+            backgroundColor: '#000000',
+            scale: {
+                mode: Phaser.Scale.FIT,
+                autoCenter: Phaser.Scale.CENTER_BOTH
+            },
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 0 },
+                    debug: false
+                }
+            },
+            plugins: {
+                global: [
+                    { key: 'HybridInput', plugin: HybridInputPlugin, start: true }
+                ]
+            },
+            scene: [BootScene, WorldScene, TownScene, BattleScene],
+            callbacks: {
+                postBoot: function(game) {
+                    // MMO-specific initialization
+                    game.registry.set('mmoData', {
+                        players: {},
+                        npcs: {},
+                        enemies: {}
+                    });
+                }
+            }
+        };
+
+        // =============================================
+        // CUSTOM PLUGINS
+        // =============================================
+        class HybridInputPlugin extends Phaser.Plugins.BasePlugin {
+            constructor(pluginManager) {
+                super(pluginManager);
+                this.koKeys = null;
+                this.roPointer = null;
+            }
+
+            init() {
+                // KO-Style Keyboard Controls
+                this.koKeys = {
+                    move: {
+                        up: this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
+                        down: this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
+                        left: this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+                        right: this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D)
+                    },
+                    skills: [
+                        this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE),
+                        this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO)
+                    ]
+                };
+
+                // RO-Style Mouse Controls
+                this.roPointer = this.game.input.activePointer;
+                this.game.input.on('pointerdown', (pointer) => {
+                    if (pointer.rightButtonDown()) {
+                        this.game.events.emit('roInteract', pointer.worldX, pointer.worldY);
+                    }
+                });
+            }
+        }
+
+        // =============================================
+        // GAME SCENES
+        // =============================================
+        class BootScene extends Phaser.Scene {
+            constructor() {
+                super({ key: 'Boot' });
+            }
+
+            preload() {
+                // Display loading progress
+                this.load.on('progress', (value) => {
+                    document.getElementById('progress-fill').style.width = `${value * 100}%`;
+                });
+
+                // Load core assets
+                this.load.image('logo', 'assets/images/logo.png');
+                this.load.audio('bgm_main', 'assets/audio/bgm/main.mp3');
+
+                // Load fonts
+                this.load.script('webfont', 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js');
+            }
+
+            create() {
+                // Initialize WebFont
+                WebFont.load({
+                    custom: {
+                        families: ['Ragnarok', 'Knight'],
+                        urls: ['assets/fonts/fonts.css']
+                    },
+                    active: () => {
+                        // Start main menu after fonts load
+                        this.scene.start('World');
+                        document.getElementById('loading-screen').style.display = 'none';
+                    }
+                });
+            }
+        }
+
+        class WorldScene extends Phaser.Scene {
+            constructor() {
+                super({ key: 'World' });
+            }
+
+            create() {
+                // Add hybrid background
+                this.add.image(0, 0, 'background').setOrigin(0);
+                
+                // Create player (hybrid style)
+                const playerStyle = this.registry.get('koStyle') ? 'ko' : 'ro';
+                this.player = this.add[`${playerStyle}Character`](400, 300, `player_${playerStyle}`);
+                
+                // Start world music
+                this.sound.play('bgm_main', { loop: true });
+            }
+        }
+
+        // =============================================
+        // GAME INITIALIZATION
+        // =============================================
+        window.addEventListener('load', () => {
+            const game = new Phaser.Game(GameConfig);
+            
+            // Register custom game object factories
+            Phaser.GameObjects.GameObjectFactory.register('koCharacter', function(x, y, key) {
+                const sprite = new Phaser.GameObjects.Sprite(this.scene, x, y, key);
+                this.displayList.add(sprite);
+                this.updateList.add(sprite);
+                return sprite;
+            });
+            
+            Phaser.GameObjects.GameObjectFactory.register('roCharacter', function(x, y, key) {
+                const sprite = new Phaser.GameObjects.Sprite(this.scene, x, y, key);
+                this.displayList.add(sprite);
+                this.updateList.add(sprite);
+                return sprite;
+            });
+        });
+    </script>
+</body>
+</html>
