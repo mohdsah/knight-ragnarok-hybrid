@@ -5,222 +5,165 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KO-RO Hybrid MMO</title>
     <style>
-        :root {
-            --ko-primary: #e74c3c;  /* Knight Online red */
-            --ro-primary: #3498db;  /* Ragnarok Online blue */
-            --hybrid-accent: #9b59b6; /* Purple blend */
-        }
-        
         body {
             margin: 0;
             padding: 0;
             background: #000;
             overflow: hidden;
             font-family: 'Arial', sans-serif;
-            touch-action: none;
         }
-        
         #game-container {
             position: absolute;
             width: 100%;
             height: 100%;
-            image-rendering: pixelated;
         }
-        
         #loading-screen {
             position: absolute;
             width: 100%;
             height: 100%;
-            background: #111 url('assets/images/loading-bg.jpg') no-repeat center;
-            background-size: cover;
+            background: #000;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             color: #fff;
             z-index: 1000;
-            transition: opacity 1s;
         }
-        
-        .logo {
-            font-family: 'Ragnarok', 'Arial Black', sans-serif;
-            font-size: 4rem;
-            background: linear-gradient(to right, var(--ko-primary), var(--ro-primary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 15px rgba(0,0,0,0.7);
-            margin-bottom: 1rem;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        #progress-container {
-            width: 300px;
-            margin-top: 2rem;
-        }
-        
-        #progress-text {
-            text-align: center;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-            color: #ccc;
-        }
-        
         #progress-bar {
-            height: 8px;
+            width: 300px;
+            height: 20px;
             background: #333;
-            border-radius: 4px;
+            margin-top: 20px;
+            border-radius: 10px;
             overflow: hidden;
         }
-        
         #progress-fill {
             height: 100%;
             width: 0%;
-            background: linear-gradient(to right, var(--ko-primary), var(--hybrid-accent));
+            background: linear-gradient(to right, #f39c12, #f1c40f);
             transition: width 0.3s;
-            box-shadow: 0 0 10px var(--hybrid-accent);
         }
-        
-        #loading-tip {
-            margin-top: 2rem;
-            font-style: italic;
-            color: #aaa;
-            max-width: 300px;
-            text-align: center;
+        .logo {
+            font-family: 'Arial Black', sans-serif;
+            font-size: 48px;
+            background: linear-gradient(to right, #e74c3c, #3498db);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
     <div id="loading-screen">
-        <div class="logo">KNIGHT-RAGNAROK</div>
-        <div id="progress-container">
-            <div id="progress-text">Loading: 0%</div>
-            <div id="progress-bar">
-                <div id="progress-fill"></div>
-            </div>
+        <div class="logo">KO-RO HYBRID</div>
+        <div>Loading game assets...</div>
+        <div id="progress-bar">
+            <div id="progress-fill"></div>
         </div>
-        <div id="loading-tip">Tip: Press F1 to toggle between KO and RO control schemes</div>
     </div>
-    
     <div id="game-container"></div>
 
-    <!-- Phaser 3 with MMO plugins -->
-    <script src="libs/phaser-3.60.min.js"></script>
-    <script src="libs/phaser-mmo-plugin.js"></script>
+    <!-- Custom Phaser Build with MMO Extensions -->
+    <script src="libs/phaser.mmo.min.js"></script>
     
-    <!-- Howler for advanced audio -->
-    <script src="libs/howler.min.js"></script>
+    <!-- Custom Howler Build with MMO Extensions -->
+    <script src="libs/howler.mmo.min.js"></script>
     
     <!-- Game Scripts -->
     <script>
-        // =================================================================
+        // =============================================
         // GAME CONFIGURATION
-        // =================================================================
+        // =============================================
         const GameConfig = {
-            type: Phaser.WEBGL,
+            type: Phaser.AUTO,
             parent: 'game-container',
             width: 1280,
             height: 720,
             backgroundColor: '#000000',
-            pixelArt: true,
             scale: {
                 mode: Phaser.Scale.FIT,
-                autoCenter: Phaser.Scale.CENTER_BOTH,
-                zoom: 1
+                autoCenter: Phaser.Scale.CENTER_BOTH
             },
             physics: {
                 default: 'arcade',
                 arcade: {
                     gravity: { y: 0 },
-                    debug: false,
-                    tileBias: 16
+                    debug: false
                 }
             },
             plugins: {
                 global: [
-                    { key: 'HybridInput', plugin: HybridInputPlugin, start: true },
-                    { key: 'MMONetwork', plugin: MMONetworkPlugin, start: true }
-                ],
-                scene: [
-                    { key: 'UIPlugin', plugin: UIPlugin, mapping: 'ui' }
+                    { key: 'HybridInput', plugin: HybridInputPlugin, start: true }
                 ]
             },
-            scene: [BootScene, PreloadScene, WorldScene, TownScene, BattleScene],
+            scene: [BootScene, WorldScene, TownScene, BattleScene],
             callbacks: {
                 postBoot: function(game) {
-                    game.registry.set('gameStyle', 'hybrid'); // hybrid/ko/ro
-                    game.registry.set('players', new Map());
-                    game.registry.set('networkLatency', 0);
+                    // MMO-specific initialization
+                    game.registry.set('mmoData', {
+                        players: {},
+                        npcs: {},
+                        enemies: {}
+                    });
                 }
             }
         };
 
-        // =================================================================
-        // CORE PLUGINS
-        // =================================================================
+        // =============================================
+        // CUSTOM PLUGINS
+        // =============================================
         class HybridInputPlugin extends Phaser.Plugins.BasePlugin {
             constructor(pluginManager) {
                 super(pluginManager);
-                this.controlScheme = 'hybrid'; // hybrid/ko/ro
+                this.koKeys = null;
+                this.roPointer = null;
             }
 
-            init(config) {
-                // Keyboard controls (KO-style)
-                this.keys = {
-                    up: this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
-                    down: this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
-                    left: this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
-                    right: this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
-                    skill1: this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE),
-                    skill2: this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO),
-                    interact: this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E),
-                    toggleStyle: this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F1)
+            init() {
+                // KO-Style Keyboard Controls
+                this.koKeys = {
+                    move: {
+                        up: this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
+                        down: this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
+                        left: this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+                        right: this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D)
+                    },
+                    skills: [
+                        this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE),
+                        this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO)
+                    ]
                 };
 
-                // Mouse/pointer controls (RO-style)
-                this.pointer = this.game.input.activePointer;
-                
-                // Gamepad support
-                this.gamepad = null;
-                this.game.input.gamepad.on('connected', (pad) => {
-                    this.gamepad = pad;
+                // RO-Style Mouse Controls
+                this.roPointer = this.game.input.activePointer;
+                this.game.input.on('pointerdown', (pointer) => {
+                    if (pointer.rightButtonDown()) {
+                        this.game.events.emit('roInteract', pointer.worldX, pointer.worldY);
+                    }
                 });
             }
-
-            update() {
-                if (Phaser.Input.Keyboard.JustDown(this.keys.toggleStyle)) {
-                    this.controlScheme = 
-                        this.controlScheme === 'hybrid' ? 'ko' :
-                        this.controlScheme === 'ko' ? 'ro' : 'hybrid';
-                    this.game.events.emit('controlSchemeChanged', this.controlScheme);
-                }
-            }
         }
 
-        class MMONetworkPlugin extends Phaser.Plugins.BasePlugin {
-            // ... (MMO networking implementation)
-        }
-
-        class UIPlugin extends Phaser.Plugins.ScenePlugin {
-            // ... (UI management implementation)
-        }
-
-        // =================================================================
+        // =============================================
         // GAME SCENES
-        // =================================================================
+        // =============================================
         class BootScene extends Phaser.Scene {
             constructor() {
                 super({ key: 'Boot' });
             }
 
             preload() {
-                // Load minimal assets needed for loading screen
-                this.load.image('loading-bg', 'assets/images/ui/loading-bg.jpg');
+                // Display loading progress
+                this.load.on('progress', (value) => {
+                    document.getElementById('progress-fill').style.width = `${value * 100}%`;
+                });
+
+                // Load core assets
+                this.load.image('logo', 'assets/images/logo.png');
+                this.load.audio('bgm_main', 'assets/audio/bgm/main.mp3');
+
+                // Load fonts
                 this.load.script('webfont', 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js');
             }
 
@@ -232,73 +175,10 @@
                         urls: ['assets/fonts/fonts.css']
                     },
                     active: () => {
-                        this.scene.start('Preload');
-                    }
-                });
-            }
-        }
-
-        class PreloadScene extends Phaser.Scene {
-            constructor() {
-                super({ key: 'Preload' });
-                this.assetManifest = {
-                    images: [
-                        { key: 'ko-tileset', path: 'assets/images/maps/ko/tileset.png' },
-                        { key: 'ro-tileset', path: 'assets/images/maps/ro/tileset.png' },
-                        // ... more assets
-                    ],
-                    audio: [
-                        { key: 'bgm-elmorad', path: 'assets/audio/bgm/elmorad.ogg' },
-                        // ... more audio
-                    ]
-                };
-            }
-
-            preload() {
-                // Set up loading display
-                const progressText = document.getElementById('progress-text');
-                const progressFill = document.getElementById('progress-fill');
-                
-                this.load.on('progress', (value) => {
-                    const percent = Math.round(value * 100);
-                    progressText.textContent = `Loading: ${percent}%`;
-                    progressFill.style.width = `${percent}%`;
-                    
-                    // Rotate loading tips
-                    if (percent % 25 === 0) {
-                        const tips = [
-                            "KO characters have higher strength but slower movement",
-                            "RO characters can use more skills but have less defense",
-                            "Hybrid mode balances both playstyles"
-                        ];
-                        document.getElementById('loading-tip').textContent = 
-                            tips[Math.floor(Math.random() * tips.length)];
-                    }
-                });
-
-                // Load assets from manifest
-                this.assetManifest.images.forEach(asset => {
-                    this.load.image(asset.key, asset.path);
-                });
-                
-                this.assetManifest.audio.forEach(asset => {
-                    this.load.audio(asset.key, asset.path);
-                });
-
-                // Load other required assets
-                this.load.atlas('characters', 'assets/images/characters/atlas.png', 'assets/images/characters/atlas.json');
-                this.load.json('elmorad-map', 'assets/data/maps/elmorad.json');
-                this.load.json('prontera-map', 'assets/data/maps/prontera.json');
-            }
-
-            create() {
-                // Start the game after a brief transition
-                this.time.delayedCall(500, () => {
-                    this.scene.start('World', { startingMap: 'elmorad' });
-                    document.getElementById('loading-screen').style.opacity = 0;
-                    this.time.delayedCall(1000, () => {
+                        // Start main menu after fonts load
+                        this.scene.start('World');
                         document.getElementById('loading-screen').style.display = 'none';
-                    });
+                    }
                 });
             }
         }
@@ -308,68 +188,38 @@
                 super({ key: 'World' });
             }
 
-            init(data) {
-                this.startingMap = data.startingMap || 'elmorad';
-            }
-
             create() {
-                // Initialize hybrid game systems
-                this.initMapSystem();
-                this.initCharacterSystem();
-                this.initAudioSystem();
-                this.initUISystem();
+                // Add hybrid background
+                this.add.image(0, 0, 'background').setOrigin(0);
                 
-                // Start game loop
-                this.events.on('update', this.updateSystems, this);
+                // Create player (hybrid style)
+                const playerStyle = this.registry.get('koStyle') ? 'ko' : 'ro';
+                this.player = this.add[`${playerStyle}Character`](400, 300, `player_${playerStyle}`);
+                
+                // Start world music
+                this.sound.play('bgm_main', { loop: true });
             }
-
-            initMapSystem() {
-                // Load appropriate map based on game style
-                const style = this.registry.get('gameStyle');
-                const mapKey = style === 'ko' ? 'elmorad-map' : 
-                              style === 'ro' ? 'prontera-map' : 
-                              Math.random() > 0.5 ? 'elmorad-map' : 'prontera-map';
-                
-                this.map = this.make.tilemap({ key: mapKey });
-                const tileset = this.map.addTilesetImage(
-                    style === 'ko' ? 'ko-tileset' : 'ro-tileset'
-                );
-                
-                this.groundLayer = this.map.createLayer('ground', tileset, 0, 0);
-                this.objectLayer = this.map.createLayer('objects', tileset, 0, 0);
-                
-                // Set collision
-                this.objectLayer.setCollisionByProperty({ collides: true });
-                this.physics.world.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
-            }
-
-            // ... other systems and methods
         }
 
-        // =================================================================
+        // =============================================
         // GAME INITIALIZATION
-        // =================================================================
+        // =============================================
         window.addEventListener('load', () => {
             const game = new Phaser.Game(GameConfig);
             
             // Register custom game object factories
             Phaser.GameObjects.GameObjectFactory.register('koCharacter', function(x, y, key) {
-                const char = new KOCharacter(this.scene, x, y, key);
-                this.displayList.add(char);
-                this.updateList.add(char);
-                return char;
+                const sprite = new Phaser.GameObjects.Sprite(this.scene, x, y, key);
+                this.displayList.add(sprite);
+                this.updateList.add(sprite);
+                return sprite;
             });
             
             Phaser.GameObjects.GameObjectFactory.register('roCharacter', function(x, y, key) {
-                const char = new ROCharacter(this.scene, x, y, key);
-                this.displayList.add(char);
-                this.updateList.add(char);
-                return char;
-            });
-            
-            // Handle window resize
-            window.addEventListener('resize', () => {
-                game.scale.refresh();
+                const sprite = new Phaser.GameObjects.Sprite(this.scene, x, y, key);
+                this.displayList.add(sprite);
+                this.updateList.add(sprite);
+                return sprite;
             });
         });
     </script>
